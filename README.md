@@ -6,3 +6,5 @@ All code use the coding standards defined in https://docs.unrealengine.com/en-US
 
 Currently implemented:
 - Blink ability from Dishonored (full C++)
+
+![](Blink.png)
