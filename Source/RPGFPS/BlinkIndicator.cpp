@@ -18,7 +18,7 @@ void ABlinkIndicator::BeginPlay()
 	Super::BeginPlay();
 
 	// Disable everything at the start
-	DisableActor(true);
+	SetActorActive(false);
 }
 
 // Called every frame
@@ -28,9 +28,9 @@ void ABlinkIndicator::Tick(float DeltaTime)
 }
 
 // Function made to enable/disable the actor
-void ABlinkIndicator::DisableActor(bool State)
+void ABlinkIndicator::SetActorActive(bool State)
 {
-	if (State)
+	if (!State)
 	{
 		for (int i = 0; i < BlinkParticles.Num(); i++)
 		{
@@ -45,25 +45,15 @@ void ABlinkIndicator::DisableActor(bool State)
 		}
 	}
 
-	DisableArrows(State);
+	SetArrowsActive(State);
 }
 
 // Function made to enable/disable the direction arrows indicating that we will blink on top of a wall
-void ABlinkIndicator::DisableArrows(bool State)
+void ABlinkIndicator::SetArrowsActive(bool State)
 {
 	for (int i = 0; i < Arrows.Num(); i++)
 	{
-		Arrows[i]->SetHiddenInGame(State);
+		Arrows[i]->SetHiddenInGame(!State);
 	}
-}
-
-// Align arrows towards the player
-void ABlinkIndicator::AlignArrows(FVector ImpactNormal)
-{
-	//for (int i = 0; i < Arrows.Num(); i++)
-	//{
-	//	FRotator NormalRotator = UKismetMathLibrary::MakeRotFromX(ImpactNormal);
-	//	Arrows[i]->SetWorldRotation(FRotator(Arrows[i]->GetComponentRotation().Roll, NormalRotator.Pitch, NormalRotator.Yaw + 90.0f));
-	//}
 }
 

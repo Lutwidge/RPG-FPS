@@ -24,13 +24,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Function made to enable/disable the actor
-	void DisableActor(bool State);
+	void SetActorActive(bool State);
 
 	// Function made to enable/disable the direction arrows indicating that we will blink on top of a wall
-	void DisableArrows(bool State);
-
-	// Align the arrows towards the player
-	void AlignArrows(FVector ImpactNormal);
+	void SetArrowsActive(bool State);
 
 protected:
 	// Arrow pointer meshes

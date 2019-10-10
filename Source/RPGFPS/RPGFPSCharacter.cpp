@@ -138,19 +138,19 @@ void ARPGFPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ARPGFPSCharacter::LookUpAtRate);
 
 	// Bind the Blink Power
-	PlayerInputComponent->BindAction("Blink", IE_Pressed, this, &ARPGFPSCharacter::BlinkTargetting);
-	PlayerInputComponent->BindAction("Blink", IE_Released, this, &ARPGFPSCharacter::BlinkActivated);
+	PlayerInputComponent->BindAction("Blink", IE_Pressed, this, &ARPGFPSCharacter::PowerPressed);
+	PlayerInputComponent->BindAction("Blink", IE_Released, this, &ARPGFPSCharacter::PowerReleased);
 }
 
 // Blink power input functions
-void ARPGFPSCharacter::BlinkTargetting()
+void ARPGFPSCharacter::PowerPressed()
 {
-	BlinkTargettingEvent.Broadcast();
+	PowerPressedEvent.Broadcast();
 }
 
-void ARPGFPSCharacter::BlinkActivated()
+void ARPGFPSCharacter::PowerReleased()
 {
-	BlinkActivatedEvent.Broadcast();
+	PowerReleasedEvent.Broadcast();
 }
 
 void ARPGFPSCharacter::OnFire()

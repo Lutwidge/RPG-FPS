@@ -5,13 +5,14 @@
 class ABlinkIndicator;
 class UCameraComponent;
 class ARPGFPSCharacter;
+#include "Power.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BlinkPower.generated.h"
 
 
 UCLASS( ClassGroup=(Blink), meta=(BlueprintSpawnableComponent) )
-class RPGFPS_API UBlinkPower : public UActorComponent
+class RPGFPS_API UBlinkPower : public UActorComponent, public IPower
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// Function to implement from the interface
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Power")
+	void SetPowerActive(bool State); // This tells the engine that we can call and override this function in blueprints
+	virtual void SetPowerActive_Implementation(bool State) override; // Actual implementation
 
 private:
 	// Blink targetting behaviour
@@ -104,14 +110,14 @@ protected:
 	float IndicatorHeightModifier;
 
 private:
-	// Reference to the blink indicator that will be spawned
-	ABlinkIndicator* BlinkIndicator;
-
 	// Reference to the camera component of the character
 	UCameraComponent* Cam;
 
 	// Reference to the character the power is linked to
 	ARPGFPSCharacter* Character;
+
+	// Reference to the blink indicator that will be spawned
+	ABlinkIndicator* BlinkIndicator;
 
 	// Is the character in the middle of the blink process
 	bool bIsBlinking;

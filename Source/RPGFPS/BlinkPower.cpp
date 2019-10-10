@@ -16,11 +16,9 @@ UBlinkPower::UBlinkPower()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// Not blinking by default
+	// Default values
 	bIsBlinking = false;
 	bIsTargettingActivated = false;
-
-	// Default values
 	DefaultFOV = 90.0f;
 	BlinkRange = 1000.0f;
 	TargettingRadius = 32.0f;
@@ -59,8 +57,6 @@ void UBlinkPower::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// TODO : Check the interface implementation
-
 	// Spawn the blink indicator
 	Character = Cast<ARPGFPSCharacter>(GetOwner());
 	FVector SpawnLocation;
@@ -90,7 +86,14 @@ void UBlinkPower::BeginPlay()
 
 	// Get the camera component and set the default FOV
 	Cam = Character->GetFirstPersonCameraComponent();
-	Cam->FieldOfView = DefaultFOV;
+	if (!Cam)
+	{
+		UE_LOG(LogTemp, Error, TEXT("BlinkPower: Camera not found!"));
+	}
+	else
+	{
+		Cam->FieldOfView = DefaultFOV;
+	}
 
 	// Create the sweep parameters
 	Sphere = FCollisionShape::MakeSphere(TargettingRadius);
@@ -98,8 +101,7 @@ void UBlinkPower::BeginPlay()
 	SweepParams.AddIgnoredActor(Character); // Ignore the character in the sweep
 
 	// Subscribe to the correct events
-	Character->OnBlinkTargetting().AddUFunction(this, FName("BlinkTargettingActivation"));
-	Character->OnBlinkActivated().AddUFunction(this, FName("BlinkActivated"));
+	SetPowerActive_Implementation(true);
 
 	// Initialize the FOV elapsed time
 	Elapsed = 0.0f;
@@ -114,6 +116,24 @@ void UBlinkPower::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	if (bIsTargettingActivated)
 	{
 		UpdateBlink();
+	}
+}
+
+// Interface implementation
+void UBlinkPower::SetPowerActive_Implementation(bool State)
+{
+	if (State)
+	{
+		// Subscribe to the correct events
+		Character->OnPowerPressed().AddUFunction(this, FName("BlinkTargettingActivation"));
+		Character->OnPowerReleased().AddUFunction(this, FName("BlinkActivated"));
+	}
+	else
+	{
+		// Unsubscribe and reset the targetting
+		Character->OnPowerPressed().RemoveAll(this);
+		Character->OnPowerReleased().RemoveAll(this);
+		bIsTargettingActivated = false;
 	}
 }
 
@@ -175,12 +195,11 @@ void UBlinkPower::UpdateBlink()
 	BlinkIndicator->SetActorLocation(IndicatorLocation, false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 	if (bIsWallTopAccessible)
 	{
-		BlinkIndicator->DisableArrows(false);
-		BlinkIndicator->AlignArrows(Hit.ImpactNormal);
+		BlinkIndicator->SetArrowsActive(true);
 	}
 	else
 	{
-		BlinkIndicator->DisableArrows(true);
+		BlinkIndicator->SetArrowsActive(false);
 	}
 
 	// Update the destination point: add the half height to take into account the character collider
@@ -197,7 +216,7 @@ void UBlinkPower::BlinkTargettingActivation()
 	// Activate the target only if we are not blinking and if it's not already activated
 	if (!bIsBlinking && !bIsTargettingActivated)
 	{
-		BlinkIndicator->DisableActor(false);
+		BlinkIndicator->SetActorActive(true);
 		bIsTargettingActivated = true;
 	}
 }
@@ -205,7 +224,7 @@ void UBlinkPower::BlinkTargettingActivation()
 // Deactivates the indicator
 void UBlinkPower::BlinkTargettingDeactivation()
 {
-	BlinkIndicator->DisableActor(true);
+	BlinkIndicator->SetActorActive(false);
 	bIsTargettingActivated = false;
 }
 

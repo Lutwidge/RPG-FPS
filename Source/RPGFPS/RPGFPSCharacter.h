@@ -8,8 +8,8 @@
 
 class UInputComponent;
 
-DECLARE_EVENT(ARPGFPSCharacter, FBlinkTargetting)
-DECLARE_EVENT(ARPGFPSCharacter, FBlinkActivated)
+DECLARE_EVENT(ARPGFPSCharacter, FPowerPressed)
+DECLARE_EVENT(ARPGFPSCharacter, FPowerReleased)
 
 UCLASS(config=Game)
 class ARPGFPSCharacter : public ACharacter
@@ -84,15 +84,15 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 	// Accessor to the blink events
-	FBlinkTargetting& OnBlinkTargetting() { return BlinkTargettingEvent; }
-	FBlinkActivated& OnBlinkActivated() { return BlinkActivatedEvent; }
+	FPowerPressed& OnPowerPressed() { return PowerPressedEvent; }
+	FPowerReleased& OnPowerReleased() { return PowerReleasedEvent; }
 
 private:
 	// Start of the blink targetting event
-	FBlinkTargetting BlinkTargettingEvent;
+	FPowerPressed PowerPressedEvent;
 
 	// Release of the blink button, meaning activation of the blink power event
-	FBlinkActivated BlinkActivatedEvent;
+	FPowerReleased PowerReleasedEvent;
 
 protected:
 	
@@ -133,9 +133,9 @@ protected:
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
 
-	// Blink power
-	void BlinkTargetting();
-	void BlinkActivated();
+	// Power
+	void PowerPressed();
+	void PowerReleased();
 	
 protected:
 	// APawn interface
